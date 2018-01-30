@@ -37,13 +37,10 @@ def draw_new_users():
     user = user_name[0]
     draw = ImageDraw.Draw(im)
     print(((MAX_W - 400) + 100 * count))
-    #cir=draw.multiline_textsize(user['first_name'] + "\n" + user['last_name'], font=username)
-    #draw.multiline_text((((MAX_W - 130-cir[0]/2)), MAX_H - 50), user['first_name'] + "\n" + user['last_name'], font=username, fill="#724738", align="center")
     fi = urllib.request.urlopen(user['photo_200']).read()
     image_file = io.BytesIO(fi)
     uimg = add_corners(Image.open(image_file), 223)
     uimg.paste(ring, (0, 0), mask=ring)
-    #im.paste(uimg, (((MAX_W - 239)), 161), mask=uimg)
     im.paste(uimg, (((MAX_W - 249)), 151), mask=uimg)
     return im
 def att_date(ATT_LIST):
@@ -71,7 +68,6 @@ def day_true_write(day):
 
 def draw_text(im):
     weather = ImageFont.truetype(folder + 'Roboto-Light.ttf', 40)
-    #weather_ext_sym = ImageFont.truetype(folder + 'IntroCondensedLight.ttf', 40)
     owm = pyowm.OWM(API_key=api_keys.API_OWM)
     owm.set_language('ru')
     obs = owm.weather_at_id(548408)
@@ -88,15 +84,6 @@ def draw_text(im):
     draw.multiline_text((((MAX_W - 550)), MAX_H - 375),
                         'АТТЕСТАЦИЯ\nУЖЕ ЧЕРЕЗ\n'+day_true_write(att_date(ATT_LIST)).upper(),
                         font=weather, fill="white", align="left")
-    #draw.multiline_text((((MAX_W - 825)), MAX_H - 155), w._detailed_status.title() +', '+ str(round(temp["temp"]))+chr(176)+'C',
-    #                    font=weather, fill="white", align="left")
-    #draw.multiline_text((((MAX_W - 800)), MAX_H - 110), 'Ветер '+str(round(w._wind["speed"]))+' м/с',
-     #                   font=weather_lite, fill="#724738", align="left")
-    #btc_rate = requests.get('https://blockchain.info/ru/ticker').text
-    #parsed_json = json.loads(btc_rate)
-    #btc_usd = parsed_json["USD"]["last"]
-    #draw.multiline_text((((MAX_W - 750)), MAX_H - 40), '1 ВТС = '+str(btc_usd)+' USD',
-     #                   font=weather, fill="#724738", align="left")
     im.save(folder + 'result.png', "PNG")
 
 
