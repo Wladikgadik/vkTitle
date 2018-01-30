@@ -15,7 +15,7 @@ import datetime
 vk_session = vk_api.VkApi(token=api_keys.API_VK)
 vk = vk_session.get_api()
 
-folder='~/vk/'
+folder='/home/vladislav/vk/'
 
 def add_corners(im, size_sq):
     size = (size_sq, size_sq)
@@ -28,8 +28,8 @@ def add_corners(im, size_sq):
 
 def draw_new_users():
     username = ImageFont.truetype(folder + 'IntroCondLightFree2.ttf', 20)
-    userlist = vk.groups.getMembers(group_id='158516227', sort="time_desc")
-    user_name = vk.users.get(user_ids=str(userlist['items']), fields="photo_200, has_photo")
+    userlist = vk.groups.getMembers(group_id='100929520', sort="time_desc")
+    user_name = vk.users.get(user_ids=str(userlist['items']), fields="photo_200_orig")
     count = 1;
     MAX_W, MAX_H = 1590, 400
     im = Image.open(folder + 'Bar_Podpisota.jpg')
@@ -37,7 +37,7 @@ def draw_new_users():
     user = user_name[0]
     draw = ImageDraw.Draw(im)
     print(((MAX_W - 400) + 100 * count))
-    fi = urllib.request.urlopen(user['photo_200']).read()
+    fi = urllib.request.urlopen(user['photo_200_orig']).read()
     image_file = io.BytesIO(fi)
     uimg = add_corners(Image.open(image_file), 223)
     uimg.paste(ring, (0, 0), mask=ring)
@@ -58,7 +58,7 @@ def day_true_write(day):
         word = 'дней'
     elif day%10 == 0 | day % 10 >= 5:
         word = 'дней'
-    elif day % 10 == 2 or 3 or 4:
+    elif day % 10 == 2 | day % 10 == 3 | day % 10 == 4:
         word = 'дня'
     else:
         word = 'день'
