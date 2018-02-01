@@ -29,15 +29,14 @@ def add_corners(im, size_sq):
 def draw_new_users():
     username = ImageFont.truetype(folder + 'IntroCondLightFree2.ttf', 20)
     userlist = vk.groups.getMembers(group_id='100929520', sort="time_desc")
-    user_name = vk.users.get(user_ids=str(userlist['items']), fields="photo_200_orig")
+    user = vk.users.get(user_ids=str(userlist['items'][0]), fields="photo_200")
     count = 1;
     MAX_W, MAX_H = 1590, 400
     im = Image.open(folder + 'Bar_Podpisota.jpg')
     ring = Image.open(folder + 'ring.png')
-    user = user_name[0]
     draw = ImageDraw.Draw(im)
     print(((MAX_W - 400) + 100 * count))
-    fi = urllib.request.urlopen(user['photo_200_orig']).read()
+    fi = urllib.request.urlopen(user['photo_200']).read()
     image_file = io.BytesIO(fi)
     uimg = add_corners(Image.open(image_file), 223)
     uimg.paste(ring, (0, 0), mask=ring)
@@ -56,9 +55,9 @@ def att_date(ATT_LIST):
 def day_true_write(day):
     if (day%100)//10 == 1:
         word = 'дней'
-    elif day%10 == 0 | day % 10 >= 5:
+    elif (day%10 == 0) | (day % 10 >= 5):
         word = 'дней'
-    elif day % 10 == 2 | day % 10 == 3 | day % 10 == 4:
+    elif (day % 10 == 2) | (day % 10 == 3) | (day % 10 == 4):
         word = 'дня'
     else:
         word = 'день'
@@ -91,7 +90,7 @@ while(True):
 
     image = draw_new_users()
     draw_text(image)
-    upload_url=vk.photos.getOwnerCoverPhotoUploadServer(group_id='158516227',crop_x2=1590,crop_y2=400)['upload_url']
+    upload_url=vk.photos.getOwnerCoverPhotoUploadServer(group_id='100929520',crop_x2=1590,crop_y2=400)['upload_url']
     imgs = {'photo': ('photo.png', open(folder+'result.png', 'rb') )}
     response = requests.post(upload_url, files=imgs)
     result = json.loads(response.text)
