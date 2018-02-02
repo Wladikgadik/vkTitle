@@ -28,15 +28,16 @@ def add_corners(im, size_sq):
 
 def draw_new_users():
     username = ImageFont.truetype(folder + 'IntroCondLightFree2.ttf', 20)
-    userlist = vk.groups.getMembers(group_id='100929520', sort="time_desc")
-    user = vk.users.get(user_ids=str(userlist['items'][0]), fields="photo_200")
-    count = 1;
+    try:
+        userlist = vk.groups.getMembers(group_id='100929520', sort="time_desc")
+        user = vk.users.get(user_ids=str(userlist['items'][0]), fields="photo_200")
+    except vk_api.ApiError as error_msg:
+        print(error_msg)
     MAX_W, MAX_H = 1590, 400
     im = Image.open(folder + 'Bar_Podpisota.jpg')
     ring = Image.open(folder + 'ring.png')
     draw = ImageDraw.Draw(im)
-    print(((MAX_W - 400) + 100 * count))
-    fi = urllib.request.urlopen(user['photo_200']).read()
+    fi = urllib.request.urlopen(user[0]['photo_200']).read()
     image_file = io.BytesIO(fi)
     uimg = add_corners(Image.open(image_file), 223)
     uimg.paste(ring, (0, 0), mask=ring)
@@ -71,13 +72,16 @@ def draw_text(im):
     owm.set_language('ru')
     obs = owm.weather_at_id(548408)
     w=obs.get_weather()
+    weather_status = w._detailed_status.title().upper()
+    if weather_status =="СЛЕГКА ОБЛАЧНО":
+        weather_status = "ОБЛАЧНО"
     temp = w.get_temperature('celsius')
     MAX_W, MAX_H = 1590, 400
     ATT_LIST = ["12-03","23-04"]
 
     draw = ImageDraw.Draw(im)
     draw.multiline_text((((MAX_W - 950)), MAX_H - 375),
-                        'В РАЙОНЕ\n1 КОРПУСА ВЯТГУ\n' + w._detailed_status.title().upper() + ', ' + str(
+                        'В РАЙОНЕ\n1 КОРПУСА ВЯТГУ\n' + weather_status + ', ' + str(
                             round(temp["temp"])) + chr(730) + 'C',
                         font=weather, fill="white", align="right")
     draw.multiline_text((((MAX_W - 550)), MAX_H - 375),
@@ -90,7 +94,10 @@ while(True):
 
     image = draw_new_users()
     draw_text(image)
-    upload_url=vk.photos.getOwnerCoverPhotoUploadServer(group_id='100929520',crop_x2=1590,crop_y2=400)['upload_url']
+    try:
+        upload_url=vk.photos.getOwnerCoverPhotoUploadServer(group_id='100929520',crop_x2=1590,crop_y2=400)['upload_url']
+    except vk_api.ApiError as error_msg:
+        print(error_msg)
     imgs = {'photo': ('photo.png', open(folder+'result.png', 'rb') )}
     response = requests.post(upload_url, files=imgs)
     result = json.loads(response.text)
@@ -98,5 +105,5 @@ while(True):
         ex=vk.photos.saveOwnerCoverPhoto(hash=result['hash'],photo=result['photo'])
     except vk_api.ApiError as error_msg:
         print(error_msg)
-    print("Pause\n")
+    print(str(datetime.datetime.now())+"\n")
     time.sleep(50)
